@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  dev10-mysql:
+    build: ./shopping-cart-api/db
+    container_name: dev10-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: heyrootisip3254ty54gDc  # Replace with a strong root password
+      MYSQL_DATABASE: myshoppingcart10         # Replace with the name of your database
+      MYSQL_USER: dev                 # Replace with your custom user
+      MYSQL_PASSWORD: heythisips1289Defcicda         # Replace with a strong password for the user
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "23306:3306"                       # Expose MySQL port
+    volumes:
+      - dev10_mysql_data:/var/lib/mysql         # Persist data between container restarts
+    networks:
+      - mynetwork
+
+  shopping-cart-api:
+    build: ./shopping-cart-api
+    volumes:
+      - ./shopping-cart-api:/app
+    environment:
+      DB_HOST: dev10-mysql
+      DB_PORT: 3306
+      DB_USER: dev
+      DB_PASSWORD: heythisips1289Defcicda
+      DB_NAME: myshoppingcart10
+    depends_on:
+      - dev10-mysql
+    ports:
+      - "8535:8000"
+    networks:
+      - mynetwork
+
+  react-shopping-cart:
+    build: ./react-shopping-cart
+    environment:
+      production: true
+      REACT_APP_API_SERVER: "http://127.0.0.1:8535"
+    depends_on:
+      - shopping-cart-api
+    ports:
+      - "8530:3000"
+
+  my-new-router-v1:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./my-new-router/level1/:/app
+      - ./flag/flag_cmdv1:/flag_read_m3
+    ports:
+      - 8501:80/tcp
+
+  my-new-router-v2:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./my-new-router/level2/:/app
+    ports:
+      - 8502:80/tcp
+
+  my-new-router-v3:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./my-new-router/level3/:/app
+    ports:
+      - 8503:80/tcp
+
+  my-new-router-v4:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./my-new-router/level4/:/app
+    ports:
+      - 8504:80/tcp
+
+  user-not-found-ssti-v1:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./user-not-found/level1:/app
+      - ./flag/flag_32fe2390:/flag_32fe2390
+    ports:
+      - 8541:80/tcp
+
+  user-not-found-ssti-v2:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./user-not-found/level2/:/app
+      - ./flag/flag_9023nd:/flag_9023nd
+    ports:
+      - 8542:80/tcp
+
+  user-not-found-ssti-v3:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./user-not-found/level3/:/app
+      - ./flag/flag_io32nnfdwq:/flag_io32nnfdwq
+    ports:
+      - 8543:80/tcp
+
+  user-not-found-ssti-v4:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./user-not-found/level4/:/app
+      - ./flag/flag_jn23fswm:/flag_jn23fswm
+    ports:
+      - 8544:80/tcp
+
+  flask-image-processor:
+    image: tiangolo/uwsgi-nginx-flask:python3.10
+    volumes:
+      - ./flask-image-processor/:/app
+    ports:
+      - 8511:80/tcp
+
+volumes:
+  dev10_mysql_data:
+
+
+networks:
+  mynetwork:
+    driver: bridge
